@@ -1,0 +1,6 @@
+# Channel ID of the channel where the bot will send logs
+logs_channel = 999999999999999
+
+# Either "DEBUG", "INFO", "WARNING", "ERROR" or "CRITICAL"
+# Logs with a level lower than the one specified will be ignored
+log_level = "WARNING"
