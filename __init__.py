@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Awaitable, Any, Callable
 
 import discord
+from discord.ext import commands
 
 import breadcord
 
@@ -41,6 +42,13 @@ class ChannelLogs(breadcord.module.ModuleCog):
     def __init__(self, module_id) -> None:
         super().__init__(module_id)
         self.channel = None
+        self.ignored_exceptions: tuple[type[BaseException], ...] = (
+            asyncio.CancelledError,
+            commands.CommandNotFound,
+            commands.NotOwner,
+            commands.BadArgument,
+            discord.ConnectionClosed,
+        )
 
     async def cog_load(self) -> None:
         self.channel = await self.bot.fetch_channel(self.settings.logs_channel.value)
@@ -66,6 +74,9 @@ class ChannelLogs(breadcord.module.ModuleCog):
         embed.title += record.levelname.title()
 
         if record.exc_info:
+            if record.exc_info[0] in self.ignored_exceptions:
+                return
+
             embed.add_field(
                 name="Traceback",
                 value=f"```py\n{record.exc_text}```",
