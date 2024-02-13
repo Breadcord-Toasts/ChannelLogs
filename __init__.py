@@ -1,4 +1,5 @@
 import asyncio
+import io
 import logging
 from enum import Enum
 from typing import Awaitable, Any, Callable
@@ -73,17 +74,24 @@ class ChannelLogs(breadcord.module.ModuleCog):
             embed.title += "\N{WARNING SIGN} "
         embed.title += record.levelname.title()
 
+        file = None
         if record.exc_info:
             if record.exc_info[0] in self.ignored_exceptions:
                 return
 
-            embed.add_field(
-                name="Traceback",
-                value=f"```py\n{record.exc_text}```",
-                inline=False,
-            )
+            if len(record.exc_text) < 1000:
+                embed.add_field(
+                    name="Traceback",
+                    value=f"```py\n{record.exc_text}```",
+                    inline=False,
+                )
+            else:
+                file = discord.File(
+                    filename="traceback.txt",
+                    fp=io.BytesIO(record.exc_text.encode()),
+                )
 
-        await self.channel.send(embed=embed)
+        await self.channel.send(embed=embed, file=file)
 
 
 async def setup(bot: breadcord.Bot):
