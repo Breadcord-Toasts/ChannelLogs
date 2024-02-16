@@ -58,6 +58,13 @@ class ChannelLogs(breadcord.module.ModuleCog):
             if isinstance(logger, logging.Logger):
                 logger.addHandler(DiscordHandler(self.logging_callback, self.bot))
 
+    async def cog_unload(self) -> None:
+        for logger in logging.Logger.manager.loggerDict.values():
+            if isinstance(logger, logging.Logger):
+                for handler in logger.handlers:
+                    if isinstance(handler, DiscordHandler):
+                        logger.removeHandler(handler)
+
     async def logging_callback(self, record: logging.LogRecord) -> None:
         if record.levelno < LogLevel[self.settings.log_level.value.upper()].value:
             return
