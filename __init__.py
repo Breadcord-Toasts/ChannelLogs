@@ -72,7 +72,7 @@ class ChannelLogs(breadcord.module.ModuleCog):
         embed = discord.Embed(
             title="",
             colour=LogLevelColour[record.levelname].value,
-            description=record.getMessage()
+            description=record.getMessage() if len(record.getMessage()) < 400 else record.getMessage()[:400] + "...",
         ).set_footer(text=record.name)
 
         if record.levelno > logging.WARNING:
@@ -82,7 +82,7 @@ class ChannelLogs(breadcord.module.ModuleCog):
         embed.title += record.levelname.title()
 
         file = None
-        if record.exc_info:
+        if record.exc_info and record.exc_text:
             if record.exc_info[0] in self.ignored_exceptions:
                 return
 
