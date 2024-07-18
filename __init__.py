@@ -101,5 +101,5 @@ class ChannelLogs(breadcord.module.ModuleCog):
         await self.channel.send(embed=embed, file=file)
 
 
-async def setup(bot: breadcord.Bot):
-    await bot.add_cog(ChannelLogs("channel_logs"))
+async def setup(bot: breadcord.Bot, module: breadcord.module.Module) -> None:
+    await bot.add_cog(ChannelLogs(module.id))
